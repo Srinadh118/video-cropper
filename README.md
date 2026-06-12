@@ -29,8 +29,21 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deploying to Cloudflare Pages (via GitHub)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This project is configured to deploy to Cloudflare Pages as a Cloudflare Worker using the recommended `@opennextjs/cloudflare` adapter. This compiles Next.js dynamic routing, server components, and asset handling to run on the Cloudflare Edge engine.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Setup Instructions
+
+1. **Push your code to GitHub**: Put your repository online.
+2. **Log into Cloudflare**: Go to the Cloudflare Dashboard and select **Workers & Pages**.
+3. **Create a Page**: Click **Create** -> **Pages** -> **Connect to Git** and select your repository.
+4. **Configure Build Settings**:
+   - **Framework Preset**: `None`
+   - **Build Command**: `npm run build-pages`
+   - **Build Output Directory**: `.open-next/assets`
+5. **Configure Compatibility Flags**:
+   - In the Cloudflare Pages settings, under **Settings** -> **Build & deployments** -> **Compatibility flags**:
+     - Add the `nodejs_compat` flag under **Production compatibility flags** and **Preview compatibility flags** (this is required to execute Next.js Node.js polyfills on the V8 worker engine).
+6. **Save and Deploy**: Click **Save and Deploy**. Cloudflare will pull your commits, compile the worker bundle, and deploy your site under a free `*.pages.dev` subdomain (with support for custom domains in the future).
+

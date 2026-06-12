@@ -1,0 +1,10 @@
+# Disable caching for the PWA Service Worker and web manifest to ensure updates are delivered instantly
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/site.webmanifest
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# Enable aggressive, immutable caching for static Next.js scripts and stylesheets
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
