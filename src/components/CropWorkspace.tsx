@@ -220,26 +220,7 @@ export default function CropWorkspace({
 
 
   return (
-    <div className="flex flex-col gap-6 w-full">
-      {/* Aspect Ratio Toolbar (pill-tab style from DESIGN.md) */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-hairline pb-4">
-        <span className="text-xs text-mute mr-2 font-medium">Aspect Ratio</span>
-        {["Free", "16:9", "9:16", "1:1", "4:3"].map((ratio) => (
-          <button
-            key={ratio}
-            onClick={() => onAspectRatioChange(ratio)}
-            className={`px-3 py-1 text-xs rounded-full font-medium transition-all duration-150 border
-              ${
-                aspectRatio === ratio
-                  ? "bg-surface-elevated text-ink border-stone"
-                  : "bg-transparent text-mute border-transparent hover:text-ink hover:bg-surface-card"
-              }
-            `}
-          >
-            {ratio}
-          </button>
-        ))}
-      </div>
+    <div className="flex flex-col gap-4 w-full">
 
       {/* Video Cropping Box workspace */}
       <div className="flex flex-col items-center justify-center p-6 bg-surface-card border border-hairline rounded-lg overflow-hidden relative">

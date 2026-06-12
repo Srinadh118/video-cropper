@@ -241,7 +241,7 @@ export default function ExportProgress({
       if (sourceNodeRef.current) {
         sourceNodeRef.current.disconnect();
       }
-      if (audioCtxRef.current) {
+      if (audioCtxRef.current && audioCtxRef.current.state !== "closed") {
         audioCtxRef.current.close();
       }
     } catch (e) {

@@ -211,11 +211,11 @@ export default function TrimTimeline({
       </div>
 
       {/* Timeline track wrapper */}
-      <div className="relative h-12 flex items-center select-none py-2">
+      <div className="relative h-16 flex items-center select-none py-2">
         <div
           ref={containerRef}
           onClick={handleTrackClick}
-          className="relative w-full h-8 bg-surface-elevated rounded-sm border border-hairline cursor-pointer overflow-hidden"
+          className="relative w-full h-12 bg-surface-elevated rounded-sm border border-hairline cursor-pointer"
         >
           {/* Timeline background thumbnails */}
           {thumbnails.length > 0 && (
@@ -284,7 +284,7 @@ export default function TrimTimeline({
             style={{ left: `${playheadPercent}%` }}
           >
             <div className="w-[2px] h-[calc(100%+8px)] -mt-[4px] mx-auto bg-accent-red" />
-            <div className="w-2.5 h-2.5 rounded-full bg-accent-red mx-auto -mt-[42px]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-accent-red mx-auto -mt-[58px]" />
           </div>
         </div>
       </div>

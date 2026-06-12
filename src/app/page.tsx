@@ -265,7 +265,7 @@ export default function Home() {
       </header>
 
       {/* Main Container */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-12 flex flex-col items-center justify-center gap-12">
+      <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-10 flex flex-col items-center justify-center gap-12">
         {step === "UPLOAD" && (
           <div className="flex flex-col gap-10 w-full items-center text-center">
             {/* Hero Section */}
@@ -306,25 +306,45 @@ export default function Home() {
               />
 
               {/* Range Trimmer (swapped directly under video) */}
-              <div className="flex flex-col gap-3">
-                <h3 className="text-sm font-medium text-ink">Trim Video Timeline</h3>
-                <TrimTimeline
-                  videoSrc={videoSrc}
-                  videoDuration={duration}
-                  startTime={startTime}
-                  endTime={endTime}
-                  currentTime={currentTime}
-                  onTrimChange={handleTrimChange}
-                  onSeek={handleSeek}
-                  isPlaying={isPlaying}
-                  onTogglePlay={handleTogglePlay}
-                />
-              </div>
+              <TrimTimeline
+                videoSrc={videoSrc}
+                videoDuration={duration}
+                startTime={startTime}
+                endTime={endTime}
+                currentTime={currentTime}
+                onTrimChange={handleTrimChange}
+                onSeek={handleSeek}
+                isPlaying={isPlaying}
+                onTogglePlay={handleTogglePlay}
+              />
             </div>
 
             {/* Editor Control Center Sidebar */}
-            <div className="flex flex-col gap-6 w-full lg:sticky lg:top-20">
-              <h2 className="text-lg font-medium text-ink">Export Configuration</h2>
+            <div className="flex flex-col gap-6 w-full lg:sticky lg:top-24">
+              <div className="flex items-center justify-between min-h-[28px]">
+                <h2 className="text-lg font-medium text-ink">Export Configuration</h2>
+              </div>
+
+              {/* Aspect Ratio Selector (moved to sidebar) */}
+              <div className="bg-surface border border-hairline p-4 rounded-lg flex flex-col gap-3">
+                <span className="text-xs text-mute block font-medium">Aspect Ratio Presets</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {["Free", "16:9", "9:16", "1:1", "4:3"].map((ratio) => (
+                    <button
+                      key={ratio}
+                      onClick={() => setAspectRatio(ratio)}
+                      className={`px-2.5 py-1 text-xs rounded-full font-medium transition-all duration-150 border
+                        ${aspectRatio === ratio
+                          ? "bg-surface-elevated text-ink border-stone"
+                          : "bg-transparent text-mute border-transparent hover:text-ink hover:bg-surface-card"
+                        }
+                      `}
+                    >
+                      {ratio}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               {/* Precision Controls (Percentages) (swapped to sidebar) */}
               <div className="bg-surface border border-hairline p-4 rounded-lg flex flex-col gap-3">
