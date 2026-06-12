@@ -115,6 +115,9 @@ export default function TrimTimeline({
   const handleMouseDown = (type: "start" | "end" | "playhead", e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     setActiveDrag(type);
+    if (isPlaying) {
+      onTogglePlay();
+    }
   };
 
   useEffect(() => {
@@ -202,7 +205,22 @@ export default function TrimTimeline({
   return (
     <div className="flex flex-col gap-4 w-full bg-surface border border-hairline p-4 rounded-lg">
       <div className="flex items-center justify-between text-xs text-mute">
-        <span>Timeline Settings</span>
+        <div className="flex items-center gap-1.5">
+          <span>Timeline Settings</span>
+          <button
+            onClick={() => {
+              onTrimChange(0, videoDuration);
+              onSeek(0);
+            }}
+            disabled={startTime === 0 && endTime === videoDuration && currentTime === 0}
+            title="Reset Timeline Trimming"
+            className="p-1 hover:bg-surface-elevated text-stone hover:text-ink disabled:opacity-30 disabled:hover:bg-transparent rounded transition-all cursor-pointer disabled:cursor-not-allowed"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3 h-3">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+          </button>
+        </div>
         <div className="flex items-center gap-1.5 bg-surface-elevated px-2 py-0.5 rounded border border-hairline">
           <span className="text-ink font-mono">{formatTime(currentTime)}</span>
           <span className="text-stone">/</span>

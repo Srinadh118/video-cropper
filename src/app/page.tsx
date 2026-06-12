@@ -62,6 +62,17 @@ export default function Home() {
     setStep("UPLOAD");
   };
 
+  // Reset all editor settings without clearing the loaded video
+  const handleResetAllSettings = () => {
+    setCrop({ x: 0, y: 0, width: 100, height: 100 });
+    setAspectRatio("Free");
+    setIncludeAudio(true);
+    setExportFormat("mp4");
+    setStartTime(0);
+    setEndTime(duration);
+    handleSeek(0);
+  };
+
   // Helper to enforce aspect ratio on crop changes
   const enforceRatio = (rect: CropRect, ratioStr: string, vWidth: number, vHeight: number): CropRect => {
     const getRatioValue = (ratio: string): number | null => {
@@ -155,16 +166,19 @@ export default function Home() {
     if (!video || step !== "EDIT") return;
 
     const handleTimeUpdate = () => {
-      setCurrentTime(video.currentTime);
+      // If the video is paused/scrubbing or seeking, prevent background events
+      // from overwriting the current state.
+      if (!isPlaying) return;
+      if (video.seeking) return;
 
       // Auto-loop playhead within trimmed region
       if (video.currentTime >= endTime) {
         video.currentTime = startTime;
         setCurrentTime(startTime);
-        if (!isPlaying) {
-          video.pause();
-        }
+        return;
       }
+
+      setCurrentTime(video.currentTime);
     };
 
     const handlePauseState = () => {
@@ -265,7 +279,7 @@ export default function Home() {
       </header>
 
       {/* Main Container */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-10 flex flex-col items-center justify-center gap-12">
+      <main className="flex-1 max-w-6xl w-full mx-auto px-6 pt-10 pb-12 flex flex-col items-center justify-center gap-12">
         {step === "UPLOAD" && (
           <div className="flex flex-col gap-10 w-full items-center text-center">
             {/* Hero Section */}
@@ -280,6 +294,117 @@ export default function Home() {
 
             {/* Drag & Drop Area */}
             <VideoUpload onVideoSelected={handleVideoSelected} />
+
+            {/* SEO Content Section */}
+            <div className="mt-20 max-w-4xl w-full text-left border-t border-hairline/60 pt-16 flex flex-col gap-12">
+              <div className="flex flex-col gap-4">
+                <h2 className="text-2xl sm:text-3xl font-semibold text-ink tracking-tight">
+                  Free Video Cropper — The Ultimate Online Video Cropper and Editor
+                </h2>
+                <p className="text-sm sm:text-base text-mute leading-relaxed">
+                  Welcome to <strong className="text-ink font-semibold">freevideocropper</strong>, a privacy-first <strong className="text-ink font-semibold">free online video cropper</strong> engineered for lightning-fast edits without compromising your security. Whether you are looking for a reliable <strong className="text-ink font-semibold">video cropper tool</strong> or need to crop clips for social media, our platform performs all processing locally on your device. This means you get a powerful <strong className="text-ink font-semibold">video cropper online free</strong> of server uploads, latency, or tracking. As a client-side <strong className="text-ink font-semibold">video cropper and editor</strong>, your files are never transmitted over the internet, keeping your personal content 100% private.
+                </p>
+                <p className="text-sm sm:text-base text-mute leading-relaxed">
+                  This multi-functional tool serves as a lightweight <strong className="text-ink font-semibold">mp4 video cropper</strong> and a comprehensive web-based video trimmer. By running fully in the web browser, it acts as a native-feeling <strong className="text-ink font-semibold">video cropper windows 10</strong>, macOS, or Linux utility without requiring any installations or setup. From quick trimming to adjusting aspect ratios, our engine makes it easier than ever to <strong className="text-ink font-semibold">video crop online</strong>.
+                </p>
+              </div>
+
+              {/* Core Features Grid */}
+              <div className="flex flex-col gap-6">
+                <h3 className="text-lg font-medium text-ink tracking-tight">Core Features & Capabilities</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-surface border border-hairline p-5 rounded-lg flex flex-col gap-2">
+                    <h4 className="text-sm font-semibold text-ink">Video Cropper No Watermark</h4>
+                    <p className="text-xs text-mute leading-relaxed">
+                      Most web tools lock premium files or plaster ugly logos on exports. Our <strong className="text-ink font-medium">video cropper free</strong> tier guarantees high-quality, watermark-free results. Download clean renders that are instantly ready for professional distributions.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-surface border border-hairline p-5 rounded-lg flex flex-col gap-2">
+                    <h4 className="text-sm font-semibold text-ink">Flexible Crop Presets</h4>
+                    <p className="text-xs text-mute leading-relaxed">
+                      Easily modify dimensions with our dynamic aspect ratios. Create square outputs as the <strong className="text-ink font-medium">best video cropper for instagram</strong> posts, or switch to portrait for TikTok. Use the <strong className="text-ink font-medium">video crop editor</strong> to drag and scale custom bounds for any destination.
+                    </p>
+                  </div>
+
+                  <div className="bg-surface border border-hairline p-5 rounded-lg flex flex-col gap-2">
+                    <h4 className="text-sm font-semibold text-ink">YouTube Optimized Editing</h4>
+                    <p className="text-xs text-mute leading-relaxed">
+                      Need to repurpose horizontal content into vertical clips? Load your clips into our web client to use it as a custom <strong className="text-ink font-medium">youtube video cropper</strong>. Trim out unwanted segments, define the target window, and generate clips perfectly optimized for Shorts.
+                    </p>
+                  </div>
+
+                  <div className="bg-surface border border-hairline p-5 rounded-lg flex flex-col gap-2">
+                    <h4 className="text-sm font-semibold text-ink">Instant Local Processing</h4>
+                    <p className="text-xs text-mute leading-relaxed">
+                      Say goodbye to queues. Our web engine compiles your edits locally in seconds. Whether you need to <strong className="text-ink font-medium">video crop</strong> a single clip or trim long footage, everything finishes in the browser, making it a stellar <strong className="text-ink font-medium">online video cropper</strong>.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* How to Guide */}
+              <div className="bg-surface border border-hairline p-6 rounded-lg flex flex-col gap-4">
+                <h3 className="text-sm font-semibold text-ink uppercase tracking-wider">How to Crop Video Online: Step-by-Step</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-mute">
+                  <div className="flex flex-col gap-2">
+                    <div className="font-bold text-accent-blue text-sm">01</div>
+                    <h4 className="text-ink font-medium">Select and Load</h4>
+                    <p className="leading-relaxed">
+                      Drop your files directly into the upload block above. Our interface reads it instantly as a local file, operating as a fast <strong className="text-ink font-medium">free video cropper online</strong> interface.
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <div className="font-bold text-accent-blue text-sm">02</div>
+                    <h4 className="text-ink font-medium">Crop & Customize</h4>
+                    <p className="leading-relaxed">
+                      Use the visual workspace to drag and size your cropping boundaries. Choose specific dimensions using the aspect ratio selector or type inputs into the <strong className="text-ink font-medium">video crop online</strong> settings sidebar.
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <div className="font-bold text-accent-blue text-sm">03</div>
+                    <h4 className="text-ink font-medium">Trim & Export</h4>
+                    <p className="leading-relaxed">
+                      Define the exact playback start and end times on the timeline. Once satisfied, export directly to download your trimmed file, backed by our client-side WebM and <strong className="text-ink font-medium">mp4 video cropper</strong> engines.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* FAQs Section */}
+              <div className="flex flex-col gap-4">
+                <h3 className="text-lg font-medium text-ink tracking-tight">Frequently Asked Questions</h3>
+                <div className="flex flex-col gap-4">
+                  <div className="border-b border-hairline/60 pb-4 flex flex-col gap-1.5">
+                    <h4 className="text-sm font-semibold text-ink">Is this really a free video cropper online with no limitations?</h4>
+                    <p className="text-xs text-mute leading-relaxed">
+                      Absolutely! We designed this utility as a truly <strong className="text-ink font-medium">free video cropper</strong>. There are no registration forms, no subscription prompts, and no watermark injections on exported files. It is an open-source <strong className="text-ink font-medium">video cropper free</strong> of any artificial paywalls.
+                    </p>
+                  </div>
+
+                  <div className="border-b border-hairline/60 pb-4 flex flex-col gap-1.5">
+                    <h4 className="text-sm font-semibold text-ink">Can I run this video cropper online on Windows 10?</h4>
+                    <p className="text-xs text-mute leading-relaxed">
+                      Yes, our tool runs in all web browsers supporting modern Web standards. It works flawlessly as a <strong className="text-ink font-medium">video cropper windows 10</strong> solution in Edge, Chrome, or Firefox. Because it executes via WebAssembly locally, there are no heavy software installation files to download.
+                    </p>
+                  </div>
+
+                  <div className="border-b border-hairline/60 pb-4 flex flex-col gap-1.5">
+                    <h4 className="text-sm font-semibold text-ink">Does it support cropping videos for YouTube and Instagram?</h4>
+                    <p className="text-xs text-mute leading-relaxed">
+                      Yes. The app contains preset aspect ratios specifically tailored for popular platforms. You can load a clip and crop it to 1:1 or 9:16 aspect ratios, making it the <strong className="text-ink font-medium">best video cropper for instagram</strong> Reels or a quick <strong className="text-ink font-medium">youtube video cropper</strong>. Trimming on the timeline also ensures you meet the strict duration constraints.
+                    </p>
+                  </div>
+
+                  <div className="pb-2 flex flex-col gap-1.5">
+                    <h4 className="text-sm font-semibold text-ink">What file formats does the video cropper online tool support?</h4>
+                    <p className="text-xs text-mute leading-relaxed">
+                      The application is optimized as a high-performance <strong className="text-ink font-medium">mp4 video cropper</strong>. It reads and writes MP4 (H.264 video codec with AAC audio) and WebM formats directly. Because conversion happens locally, the export speed depends entirely on your device's hardware capabilities.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -287,13 +412,6 @@ export default function Home() {
           <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
             {/* Cropping preview & presets workspace */}
             <div className="lg:col-span-2 flex flex-col gap-6 w-full">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-medium text-ink">Crop Video Area</h2>
-                <div className="flex items-center gap-2 text-xs text-mute font-mono">
-                  <span>Input Dims:</span>
-                  <span className="text-ink">{videoDims.width} × {videoDims.height}</span>
-                </div>
-              </div>
 
               <CropWorkspace
                 videoSrc={videoSrc}
@@ -321,13 +439,56 @@ export default function Home() {
 
             {/* Editor Control Center Sidebar */}
             <div className="flex flex-col gap-6 w-full lg:sticky lg:top-24">
-              <div className="flex items-center justify-between min-h-[28px]">
-                <h2 className="text-lg font-medium text-ink">Export Configuration</h2>
+              {/* Sidebar Header with Master Reset */}
+              <div className="flex items-center justify-between pb-3 border-b border-hairline/60">
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-ink">Editor Controls</h2>
+                <button
+                  onClick={handleResetAllSettings}
+                  disabled={
+                    crop.x === 0 &&
+                    crop.y === 0 &&
+                    crop.width === 100 &&
+                    crop.height === 100 &&
+                    aspectRatio === "Free" &&
+                    exportFormat === "mp4" &&
+                    includeAudio === true &&
+                    startTime === 0 &&
+                    endTime === duration &&
+                    currentTime === 0
+                  }
+                  title="Reset All Settings"
+                  className="flex items-center gap-1 px-2.5 py-1.5 bg-surface border border-hairline text-[11px] font-medium text-mute hover:text-ink hover:border-stone disabled:opacity-30 disabled:hover:border-hairline disabled:hover:text-mute rounded transition-all cursor-pointer disabled:cursor-not-allowed"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-3.5 h-3.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                  </svg>
+                  <span>Reset All</span>
+                </button>
               </div>
 
               {/* Aspect Ratio Selector (moved to sidebar) */}
               <div className="bg-surface border border-hairline p-4 rounded-lg flex flex-col gap-3">
-                <span className="text-xs text-mute block font-medium">Aspect Ratio Presets</span>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs text-mute block font-medium">Aspect Ratio Presets</span>
+                    <button
+                      onClick={() => setAspectRatio("Free")}
+                      disabled={aspectRatio === "Free"}
+                      title="Reset Aspect Ratio"
+                      className="p-1 hover:bg-surface-elevated text-stone hover:text-ink disabled:opacity-30 disabled:hover:bg-transparent rounded transition-all cursor-pointer disabled:cursor-not-allowed"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3.5 h-3.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-mute font-mono">
+                    <span>Input Dims:</span>
+                    <span className="text-ink">{videoDims.width} × {videoDims.height}</span>
+                  </div>
+                </div>
+
                 <div className="flex flex-wrap gap-1.5">
                   {["Free", "16:9", "9:16", "1:1", "4:3"].map((ratio) => (
                     <button
@@ -344,11 +505,26 @@ export default function Home() {
                     </button>
                   ))}
                 </div>
+
               </div>
 
               {/* Precision Controls (Percentages) (swapped to sidebar) */}
               <div className="bg-surface border border-hairline p-4 rounded-lg flex flex-col gap-3">
-                <span className="text-xs text-mute block font-medium">Precision Controls (Percentages)</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs text-mute block font-medium">Precision Controls (Percentages)</span>
+                    <button
+                      onClick={() => setCrop({ x: 0, y: 0, width: 100, height: 100 })}
+                      disabled={crop.x === 0 && crop.y === 0 && crop.width === 100 && crop.height === 100}
+                      title="Reset Crop Area"
+                      className="p-1 hover:bg-surface-elevated text-stone hover:text-ink disabled:opacity-30 disabled:hover:bg-transparent rounded transition-all cursor-pointer disabled:cursor-not-allowed"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3.5 h-3.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-[11px] text-mute block mb-1">Offset X</label>
@@ -404,7 +580,24 @@ export default function Home() {
 
               {/* Export settings panel with Format selector */}
               <div className="bg-surface border border-hairline p-4 rounded-lg flex flex-col gap-4">
-                <span className="text-xs text-mute block font-medium">Export Settings</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs text-mute block font-medium">Export Settings</span>
+                    <button
+                      onClick={() => {
+                        setExportFormat("mp4");
+                        setIncludeAudio(true);
+                      }}
+                      disabled={exportFormat === "mp4" && includeAudio === true}
+                      title="Reset Export Settings"
+                      className="p-1 hover:bg-surface-elevated text-stone hover:text-ink disabled:opacity-30 disabled:hover:bg-transparent rounded transition-all cursor-pointer disabled:cursor-not-allowed"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3.5 h-3.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
 
                 {/* Format selection */}
                 <div className="flex flex-col gap-2 border-b border-hairline/50 pb-3">
