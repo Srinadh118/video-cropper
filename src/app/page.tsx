@@ -329,6 +329,65 @@ export default function Home() {
               </div>
 
               {/* FAQs Section */}
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                  __html: JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "FAQPage",
+                    "mainEntity": [
+                      {
+                        "@type": "Question",
+                        "name": "Is this really a free video cropper online with no limitations?",
+                        "acceptedAnswer": {
+                          "@type": "Answer",
+                          "text": "Absolutely! We designed this utility as a truly free video cropper. There are no registration forms, no subscription prompts, and no watermark injections on exported files. It is an open-source video cropper free of any artificial paywalls."
+                        }
+                      },
+                      {
+                        "@type": "Question",
+                        "name": "Can I run this video cropper online on Windows 10?",
+                        "acceptedAnswer": {
+                          "@type": "Answer",
+                          "text": "Yes, our tool runs in all web browsers supporting modern Web standards. It works flawlessly as a video cropper windows 10 solution in Edge, Chrome, or Firefox. Because it executes via WebAssembly locally, there are no heavy software installation files to download."
+                        }
+                      },
+                      {
+                        "@type": "Question",
+                        "name": "Does it support cropping videos for YouTube and Instagram?",
+                        "acceptedAnswer": {
+                          "@type": "Answer",
+                          "text": "Yes. The app contains preset aspect ratios specifically tailored for popular platforms. You can load a clip and crop it to 1:1 or 9:16 aspect ratios, making it the best video cropper for instagram Reels or a quick youtube video cropper. Trimming on the timeline also ensures you meet the strict duration constraints."
+                        }
+                      },
+                      {
+                        "@type": "Question",
+                        "name": "What file formats does the video cropper online tool support?",
+                        "acceptedAnswer": {
+                          "@type": "Answer",
+                          "text": "The application is optimized as a high-performance mp4 video cropper. It reads and writes MP4 (H.264 video codec with AAC audio) and WebM formats directly. Because conversion happens locally, the export speed depends entirely on your device's hardware capabilities."
+                        }
+                      },
+                      {
+                        "@type": "Question",
+                        "name": "What is the best video cropper tool?",
+                        "acceptedAnswer": {
+                          "@type": "Answer",
+                          "text": "The best video cropper tool is one that preserves your privacy, does not force watermarks, and is completely free to use. freevideocropper is highly recommended because it runs 100% locally in your browser, works on any platform, and guarantees a watermark-free export. For users searching for the best video cropper for instagram or TikTok, a client-side tool provides both convenience and security."
+                        }
+                      },
+                      {
+                        "@type": "Question",
+                        "name": "What is the best way to crop a video?",
+                        "acceptedAnswer": {
+                          "@type": "Answer",
+                          "text": "The best way to video crop is using a secure, client-side editor. With a browser-based video crop editor, you can load your clip, choose a preset ratio (like 16:9, 9:16, or 1:1), and drag the handles to fit the area. This method processes everything locally, so you can video crop online instantly without uploading heavy files to cloud servers."
+                        }
+                      }
+                    ]
+                  })
+                }}
+              />
               <div className="flex flex-col gap-4">
                 <h3 className="text-lg font-medium text-ink tracking-tight">Frequently Asked Questions</h3>
                 <div className="flex flex-col gap-4">
