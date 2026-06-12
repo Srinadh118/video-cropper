@@ -6,6 +6,8 @@ import CropWorkspace from "@/components/CropWorkspace";
 import TrimTimeline from "@/components/TrimTimeline";
 import ExportProgress from "@/components/ExportProgress";
 import ExportCompleted from "@/components/ExportCompleted";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 type AppStep = "UPLOAD" | "EDIT" | "EXPORT" | "COMPLETED";
 
@@ -230,53 +232,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-canvas text-body selection:bg-accent-blue/20 selection:text-ink">
-      {/* Decorative Red Stripes Banner at top (DESIGN.md launch-banner motif) */}
-      <div className="absolute top-0 left-0 right-0 overflow-hidden h-2 pointer-events-none select-none flex justify-center gap-1.5 opacity-80 z-50">
-        <div className="w-28 h-full bg-gradient-to-r from-hero-stripe-start to-hero-stripe-end transform -skew-x-12" />
-        <div className="w-28 h-full bg-gradient-to-r from-hero-stripe-start to-hero-stripe-end transform -skew-x-12" />
-        <div className="w-28 h-full bg-gradient-to-r from-hero-stripe-start to-hero-stripe-end transform -skew-x-12" />
-      </div>
-
       {/* Navigation Header (DESIGN.md primary-nav) */}
-      <header className="w-full bg-canvas border-b border-hairline h-14 flex items-center px-6 sticky top-0 z-40">
-        <div className="max-w-6xl w-full mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2.5 cursor-pointer" onClick={handleRestart}>
-            {/* Visual Logo Accent (Hacker News yellow/orange category detail) */}
-            <div className="w-6 h-6 rounded bg-accent-yellow-soft border border-accent-yellow/20 flex items-center justify-center text-accent-yellow">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="w-3.5 h-3.5"
-              >
-                <path d="M10 3.75a2 2 0 1 0-4 0 2 2 0 0 0 4 0ZM17.25 4.5a.75.75 0 0 0-.75-.75h-2.25a.75.75 0 0 0 0 1.5h2.25a.75.75 0 0 0 .75-.75ZM17.25 15.5a.75.75 0 0 0-.75-.75h-2.25a.75.75 0 0 0 0 1.5h2.25a.75.75 0 0 0 .75-.75ZM5.75 16.25a.75.75 0 0 1 .75-.75h2.25a.75.75 0 0 1 0 1.5H6.5a.75.75 0 0 1-.75-.75ZM10 16.25a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM14.25 10a2 2 0 1 0-4 0 2 2 0 0 0 4 0Z" />
-              </svg>
-            </div>
-            <span className="font-semibold text-ink text-sm tracking-tight font-sans">
-              VideoCrop
-            </span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-mute hover:text-ink transition-colors font-medium"
-            >
-              GitHub
-            </a>
-            {step !== "UPLOAD" && (
-              <button
-                onClick={handleRestart}
-                className="h-7 px-3 bg-primary-cta text-on-primary hover:bg-primary-cta-pressed text-xs font-semibold rounded-md transition-colors"
-              >
-                Start New
-              </button>
-            )}
-          </div>
-        </div>
-      </header>
+      <Header onRestart={handleRestart} showStartNew={step !== "UPLOAD"} />
 
       {/* Main Container */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-6 pt-10 pb-12 flex flex-col items-center justify-center gap-12">
@@ -396,13 +353,35 @@ export default function Home() {
                     </p>
                   </div>
 
-                  <div className="pb-2 flex flex-col gap-1.5">
+                  <div className="border-b border-hairline/60 pb-4 flex flex-col gap-1.5">
                     <h4 className="text-sm font-semibold text-ink">What file formats does the video cropper online tool support?</h4>
                     <p className="text-xs text-mute leading-relaxed">
                       The application is optimized as a high-performance <strong className="text-ink font-medium">mp4 video cropper</strong>. It reads and writes MP4 (H.264 video codec with AAC audio) and WebM formats directly. Because conversion happens locally, the export speed depends entirely on your device's hardware capabilities.
                     </p>
                   </div>
+
+                  <div className="border-b border-hairline/60 pb-4 flex flex-col gap-1.5">
+                    <h4 className="text-sm font-semibold text-ink">What is the best video cropper tool?</h4>
+                    <p className="text-xs text-mute leading-relaxed">
+                      The best <strong className="text-ink font-medium">video cropper tool</strong> is one that preserves your privacy, does not force watermarks, and is completely free to use. <strong className="text-ink font-medium">freevideocropper</strong> is highly recommended because it runs 100% locally in your browser, works on any platform, and guarantees a watermark-free export. For users searching for the <strong className="text-ink font-medium">best video cropper for instagram</strong> or TikTok, a client-side tool provides both convenience and security.
+                    </p>
+                  </div>
+
+                  <div className="pb-2 flex flex-col gap-1.5">
+                    <h4 className="text-sm font-semibold text-ink">What is the best way to crop a video?</h4>
+                    <p className="text-xs text-mute leading-relaxed">
+                      The best way to <strong className="text-ink font-medium">video crop</strong> is using a secure, client-side editor. With a browser-based <strong className="text-ink font-medium">video crop editor</strong>, you can load your clip, choose a preset ratio (like 16:9, 9:16, or 1:1), and drag the handles to fit the area. This method processes everything locally, so you can <strong className="text-ink font-medium">video crop online</strong> instantly without uploading heavy files to cloud servers.
+                    </p>
+                  </div>
                 </div>
+              </div>
+
+              {/* Quick Navigation Sitemap */}
+              <div className="bg-surface border border-hairline p-5 rounded-lg flex flex-col gap-3">
+                <h3 className="text-xs font-semibold text-ink uppercase tracking-wider">Quick Sitemap Navigation</h3>
+                <p className="text-xs text-mute leading-relaxed">
+                  Navigate our resources: learn about our privacy-first local processing on our <a href="/about" className="text-accent-blue hover:underline">About Us</a> page, read our <a href="/privacy" className="text-accent-blue hover:underline">Privacy Policy</a> to understand how your files remain local, check out our <a href="/terms" className="text-accent-blue hover:underline">Terms & Conditions</a> for usage licensing, or reach out to us with suggestions on the <a href="/contact" className="text-accent-blue hover:underline">Contact Us</a> page.
+                </p>
               </div>
             </div>
           </div>
@@ -682,21 +661,7 @@ export default function Home() {
       </main>
 
       {/* Footer (DESIGN.md footer-section) */}
-      <footer className="w-full bg-canvas border-t border-hairline mt-auto">
-        {/* Subtle red stripe gradient echo at footer top */}
-        <div className="h-[2px] bg-gradient-to-r from-hero-stripe-start/15 to-hero-stripe-end/15 w-full" />
-
-        <div className="max-w-6xl w-full mx-auto p-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-mute font-sans">
-          <div className="flex items-center gap-2.5">
-            <span className="font-semibold text-ink">VideoCrop</span>
-            <span className="text-stone">|</span>
-            <span>Local Web Processing Engine</span>
-          </div>
-          <div>
-            <span>No data uploads. Private. Open-source under MIT license.</span>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
