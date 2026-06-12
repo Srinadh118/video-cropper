@@ -51,8 +51,8 @@ export default function CropWorkspace({
     setVideoDims({ width: videoWidth, height: videoHeight });
     onVideoMetadata({ duration, width: videoWidth, height: videoHeight });
 
-    // Set initial full crop
-    onCropChange({ x: 10, y: 10, width: 80, height: 80 });
+    // Set initial full crop (no crop initially)
+    onCropChange({ x: 0, y: 0, width: 100, height: 100 });
   };
 
   // Enforce aspect ratio constraints on crop
@@ -217,26 +217,7 @@ export default function CropWorkspace({
     };
   }, [activeDrag, dragStart, crop, aspectRatio, videoDims, onCropChange]);
 
-  const handleInputChange = (field: keyof CropRect, val: number) => {
-    let nextCrop = { ...crop, [field]: val };
-    
-    // Validate bounds
-    if (field === "x") nextCrop.x = Math.min(Math.max(0, val), 100 - crop.width);
-    if (field === "y") nextCrop.y = Math.min(Math.max(0, val), 100 - crop.height);
-    if (field === "width") nextCrop.width = Math.min(Math.max(10, val), 100 - crop.x);
-    if (field === "height") nextCrop.height = Math.min(Math.max(10, val), 100 - crop.y);
 
-    if (aspectRatio !== "Free") {
-      nextCrop = enforceRatio(nextCrop, aspectRatio, videoDims.width, videoDims.height);
-    }
-
-    onCropChange({
-      x: Number(nextCrop.x.toFixed(2)),
-      y: Number(nextCrop.y.toFixed(2)),
-      width: Number(nextCrop.width.toFixed(2)),
-      height: Number(nextCrop.height.toFixed(2)),
-    });
-  };
 
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -381,61 +362,7 @@ export default function CropWorkspace({
         </div>
       </div>
 
-      {/* Coordinate Precision Controllers */}
-      <div className="bg-surface border border-hairline p-4 rounded-lg">
-        <span className="text-xs text-mute block mb-3 font-medium">Precision Controls (Percentages)</span>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div>
-            <label className="text-[11px] text-mute block mb-1">Offset X</label>
-            <input
-              type="number"
-              min="0"
-              max={100 - crop.width}
-              step="0.5"
-              value={crop.x}
-              onChange={(e) => handleInputChange("x", parseFloat(e.target.value) || 0)}
-              className="w-full bg-surface-elevated border border-hairline rounded px-2.5 py-1 text-ink font-mono text-sm focus:border-stone outline-none transition-colors"
-            />
-          </div>
-          <div>
-            <label className="text-[11px] text-mute block mb-1">Offset Y</label>
-            <input
-              type="number"
-              min="0"
-              max={100 - crop.height}
-              step="0.5"
-              value={crop.y}
-              onChange={(e) => handleInputChange("y", parseFloat(e.target.value) || 0)}
-              className="w-full bg-surface-elevated border border-hairline rounded px-2.5 py-1 text-ink font-mono text-sm focus:border-stone outline-none transition-colors"
-            />
-          </div>
-          <div>
-            <label className="text-[11px] text-mute block mb-1">Crop Width</label>
-            <input
-              type="number"
-              min="10"
-              max={100 - crop.x}
-              step="0.5"
-              value={crop.width}
-              onChange={(e) => handleInputChange("width", parseFloat(e.target.value) || 0)}
-              className="w-full bg-surface-elevated border border-hairline rounded px-2.5 py-1 text-ink font-mono text-sm focus:border-stone outline-none transition-colors"
-            />
-          </div>
-          <div>
-            <label className="text-[11px] text-mute block mb-1">Crop Height</label>
-            <input
-              type="number"
-              min="10"
-              max={100 - crop.y}
-              step="0.5"
-              value={crop.height}
-              disabled={aspectRatio !== "Free"}
-              onChange={(e) => handleInputChange("height", parseFloat(e.target.value) || 0)}
-              className="w-full bg-surface-elevated border border-hairline rounded px-2.5 py-1 text-ink font-mono text-sm focus:border-stone outline-none transition-colors disabled:opacity-40"
-            />
-          </div>
-        </div>
-      </div>
+
     </div>
   );
 }

@@ -20,11 +20,12 @@ export default function Home() {
   const [step, setStep] = useState<AppStep>("UPLOAD");
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoSrc, setVideoSrc] = useState<string>("");
-  
+
   // Crop Rect in percentages (x, y, width, height)
-  const [crop, setCrop] = useState<CropRect>({ x: 10, y: 10, width: 80, height: 80 });
+  const [crop, setCrop] = useState<CropRect>({ x: 0, y: 0, width: 100, height: 100 });
   const [aspectRatio, setAspectRatio] = useState<string>("Free");
   const [includeAudio, setIncludeAudio] = useState<boolean>(true);
+  const [exportFormat, setExportFormat] = useState<"mp4" | "webm">("mp4");
 
   // Timeline Trim Settings (in seconds)
   const [duration, setDuration] = useState<number>(0);
@@ -47,9 +48,10 @@ export default function Home() {
     }
     setVideoFile(null);
     setVideoSrc("");
-    setCrop({ x: 10, y: 10, width: 80, height: 80 });
+    setCrop({ x: 0, y: 0, width: 100, height: 100 });
     setAspectRatio("Free");
     setIncludeAudio(true);
+    setExportFormat("mp4");
     setDuration(0);
     setStartTime(0);
     setEndTime(0);
@@ -58,6 +60,65 @@ export default function Home() {
     setExportBlob(null);
     setExportMimeType("");
     setStep("UPLOAD");
+  };
+
+  // Helper to enforce aspect ratio on crop changes
+  const enforceRatio = (rect: CropRect, ratioStr: string, vWidth: number, vHeight: number): CropRect => {
+    const getRatioValue = (ratio: string): number | null => {
+      switch (ratio) {
+        case "16:9": return 16 / 9;
+        case "9:16": return 9 / 16;
+        case "1:1": return 1;
+        case "4:3": return 4 / 3;
+        default: return null;
+      }
+    };
+
+    const targetRatio = getRatioValue(ratioStr);
+    if (!targetRatio || vWidth === 0 || vHeight === 0) return rect;
+
+    const videoRatio = vWidth / vHeight;
+    const ratioPct = targetRatio / videoRatio;
+
+    let newWidth = rect.width;
+    let newHeight = rect.width / ratioPct;
+
+    if (newHeight > 100 - rect.y) {
+      newHeight = 100 - rect.y;
+      newWidth = newHeight * ratioPct;
+    }
+
+    if (newWidth > 100 - rect.x) {
+      newWidth = 100 - rect.x;
+      newHeight = newWidth / ratioPct;
+    }
+
+    return {
+      ...rect,
+      width: Number(newWidth.toFixed(2)),
+      height: Number(newHeight.toFixed(2)),
+    };
+  };
+
+  const handleInputChange = (field: keyof CropRect, val: number) => {
+    let nextCrop = { ...crop, [field]: val };
+
+    // Validate bounds
+    if (field === "x") nextCrop.x = Math.min(Math.max(0, val), 100 - crop.width);
+    if (field === "y") nextCrop.y = Math.min(Math.max(0, val), 100 - crop.height);
+    if (field === "width") nextCrop.width = Math.min(Math.max(10, val), 100 - crop.x);
+    if (field === "height") nextCrop.height = Math.min(Math.max(10, val), 100 - crop.y);
+
+    if (aspectRatio !== "Free") {
+      nextCrop = enforceRatio(nextCrop, aspectRatio, videoDims.width, videoDims.height);
+    }
+
+    setCrop({
+      x: Number(nextCrop.x.toFixed(2)),
+      y: Number(nextCrop.y.toFixed(2)),
+      width: Number(nextCrop.width.toFixed(2)),
+      height: Number(nextCrop.height.toFixed(2)),
+    });
   };
 
   const handleVideoSelected = (file: File) => {
@@ -95,7 +156,7 @@ export default function Home() {
 
     const handleTimeUpdate = () => {
       setCurrentTime(video.currentTime);
-      
+
       // Auto-loop playhead within trimmed region
       if (video.currentTime >= endTime) {
         video.currentTime = startTime;
@@ -243,28 +304,118 @@ export default function Home() {
                 aspectRatio={aspectRatio}
                 onAspectRatioChange={setAspectRatio}
               />
+
+              {/* Range Trimmer (swapped directly under video) */}
+              <div className="flex flex-col gap-3">
+                <h3 className="text-sm font-medium text-ink">Trim Video Timeline</h3>
+                <TrimTimeline
+                  videoSrc={videoSrc}
+                  videoDuration={duration}
+                  startTime={startTime}
+                  endTime={endTime}
+                  currentTime={currentTime}
+                  onTrimChange={handleTrimChange}
+                  onSeek={handleSeek}
+                  isPlaying={isPlaying}
+                  onTogglePlay={handleTogglePlay}
+                />
+              </div>
             </div>
 
             {/* Editor Control Center Sidebar */}
             <div className="flex flex-col gap-6 w-full lg:sticky lg:top-20">
               <h2 className="text-lg font-medium text-ink">Export Configuration</h2>
 
-              {/* Range Trimmer */}
-              <TrimTimeline
-                videoDuration={duration}
-                startTime={startTime}
-                endTime={endTime}
-                currentTime={currentTime}
-                onTrimChange={handleTrimChange}
-                onSeek={handleSeek}
-                isPlaying={isPlaying}
-                onTogglePlay={handleTogglePlay}
-              />
+              {/* Precision Controls (Percentages) (swapped to sidebar) */}
+              <div className="bg-surface border border-hairline p-4 rounded-lg flex flex-col gap-3">
+                <span className="text-xs text-mute block font-medium">Precision Controls (Percentages)</span>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] text-mute block mb-1">Offset X</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max={Math.max(0, 100 - crop.width)}
+                      step="0.5"
+                      value={crop.x}
+                      onChange={(e) => handleInputChange("x", parseFloat(e.target.value) || 0)}
+                      className="w-full bg-surface-elevated border border-hairline rounded px-2.5 py-1.5 text-ink font-mono text-xs focus:border-stone outline-none transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] text-mute block mb-1">Offset Y</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max={Math.max(0, 100 - crop.height)}
+                      step="0.5"
+                      value={crop.y}
+                      onChange={(e) => handleInputChange("y", parseFloat(e.target.value) || 0)}
+                      className="w-full bg-surface-elevated border border-hairline rounded px-2.5 py-1.5 text-ink font-mono text-xs focus:border-stone outline-none transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] text-mute block mb-1">Crop Width</label>
+                    <input
+                      type="number"
+                      min="10"
+                      max={Math.max(10, 100 - crop.x)}
+                      step="0.5"
+                      value={crop.width}
+                      onChange={(e) => handleInputChange("width", parseFloat(e.target.value) || 0)}
+                      className="w-full bg-surface-elevated border border-hairline rounded px-2.5 py-1.5 text-ink font-mono text-xs focus:border-stone outline-none transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] text-mute block mb-1">Crop Height</label>
+                    <input
+                      type="number"
+                      min="10"
+                      max={Math.max(10, 100 - crop.y)}
+                      step="0.5"
+                      value={crop.height}
+                      disabled={aspectRatio !== "Free"}
+                      onChange={(e) => handleInputChange("height", parseFloat(e.target.value) || 0)}
+                      className="w-full bg-surface-elevated border border-hairline rounded px-2.5 py-1.5 text-ink font-mono text-xs focus:border-stone outline-none transition-colors disabled:opacity-40"
+                    />
+                  </div>
+                </div>
+              </div>
 
-              {/* General Options settings panel */}
+              {/* Export settings panel with Format selector */}
               <div className="bg-surface border border-hairline p-4 rounded-lg flex flex-col gap-4">
-                <span className="text-xs text-mute block font-medium">Audio settings</span>
-                
+                <span className="text-xs text-mute block font-medium">Export Settings</span>
+
+                {/* Format selection */}
+                <div className="flex flex-col gap-2 border-b border-hairline/50 pb-3">
+                  <span className="text-[11px] text-mute font-medium">Output Format</span>
+                  <div className="flex bg-surface-elevated p-0.5 rounded border border-hairline gap-1">
+                    <button
+                      onClick={() => setExportFormat("mp4")}
+                      className={`flex-1 py-1 text-[11px] font-semibold rounded transition-all duration-150
+                        ${exportFormat === "mp4"
+                          ? "bg-surface text-ink shadow"
+                          : "text-mute hover:text-ink"
+                        }
+                      `}
+                    >
+                      MP4
+                    </button>
+                    <button
+                      onClick={() => setExportFormat("webm")}
+                      className={`flex-1 py-1 text-[11px] font-semibold rounded transition-all duration-150
+                        ${exportFormat === "webm"
+                          ? "bg-surface text-ink shadow"
+                          : "text-mute hover:text-ink"
+                        }
+                      `}
+                    >
+                      WebM
+                    </button>
+                  </div>
+                </div>
+
+                {/* Audio settings */}
                 <label className="flex items-center justify-between cursor-pointer group py-1">
                   <div className="flex flex-col">
                     <span className="text-xs text-ink font-medium">Retain Audio Track</span>
@@ -301,6 +452,7 @@ export default function Home() {
             endTime={endTime}
             videoDims={videoDims}
             includeAudio={includeAudio}
+            exportFormat={exportFormat}
             onCancel={handleExportCancel}
             onComplete={handleExportComplete}
           />
@@ -320,8 +472,8 @@ export default function Home() {
       <footer className="w-full bg-canvas border-t border-hairline mt-auto">
         {/* Subtle red stripe gradient echo at footer top */}
         <div className="h-[2px] bg-gradient-to-r from-hero-stripe-start/15 to-hero-stripe-end/15 w-full" />
-        
-        <div className="max-w-6xl w-full mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-mute font-sans">
+
+        <div className="max-w-6xl w-full mx-auto p-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-mute font-sans">
           <div className="flex items-center gap-2.5">
             <span className="font-semibold text-ink">VideoCrop</span>
             <span className="text-stone">|</span>

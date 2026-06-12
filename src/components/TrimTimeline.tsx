@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState } from "react";
 
 interface TrimTimelineProps {
+  videoSrc: string;
   videoDuration: number;
   startTime: number;
   endTime: number;
@@ -14,6 +15,7 @@ interface TrimTimelineProps {
 }
 
 export default function TrimTimeline({
+  videoSrc,
   videoDuration,
   startTime,
   endTime,
@@ -25,6 +27,80 @@ export default function TrimTimeline({
 }: TrimTimelineProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeDrag, setActiveDrag] = useState<"start" | "end" | "playhead" | null>(null);
+  const [thumbnails, setThumbnails] = useState<string[]>([]);
+  const [isLoadingThumbs, setIsLoadingThumbs] = useState<boolean>(false);
+
+  // Generate timeline thumbnails asynchronously
+  useEffect(() => {
+    if (videoDuration === 0 || !videoSrc) {
+      setThumbnails([]);
+      return;
+    }
+
+    let active = true;
+    setIsLoadingThumbs(true);
+    const generatedThumbs: string[] = [];
+    const numFrames = 10; // Number of frames to display in the strip
+    const interval = videoDuration / numFrames;
+    const times = Array.from({ length: numFrames }, (_, i) => i * interval + 0.05); // slight offset from 0
+
+    const tempVideo = document.createElement("video");
+    tempVideo.src = videoSrc;
+    tempVideo.muted = true;
+    tempVideo.playsInline = true;
+    tempVideo.preload = "auto";
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    
+    // Scale canvas to a small thumbnail resolution (low-res is perfect and extremely fast)
+    canvas.width = 80;
+    canvas.height = 45;
+
+    let currentIndex = 0;
+
+    const captureNextFrame = () => {
+      if (!active) return;
+      if (currentIndex >= times.length) {
+        setThumbnails(generatedThumbs);
+        setIsLoadingThumbs(false);
+        tempVideo.remove();
+        return;
+      }
+      tempVideo.currentTime = times[currentIndex];
+    };
+
+    const handleSeeked = () => {
+      if (!active) return;
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(tempVideo, 0, 0, canvas.width, canvas.height);
+        try {
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.4);
+          generatedThumbs.push(dataUrl);
+        } catch (e) {
+          console.warn("Failed to capture timeline frame:", e);
+        }
+      }
+      currentIndex++;
+      captureNextFrame();
+    };
+
+    tempVideo.addEventListener("seeked", handleSeeked);
+    
+    tempVideo.addEventListener("loadedmetadata", () => {
+      if (!active) return;
+      captureNextFrame();
+    });
+
+    tempVideo.load();
+
+    return () => {
+      active = false;
+      tempVideo.removeEventListener("seeked", handleSeeked);
+      tempVideo.remove();
+    };
+  }, [videoSrc, videoDuration]);
 
   // Format seconds to MM:SS.CC (Minutes, Seconds, Centiseconds)
   const formatTime = (time: number) => {
@@ -139,8 +215,22 @@ export default function TrimTimeline({
         <div
           ref={containerRef}
           onClick={handleTrackClick}
-          className="relative w-full h-4 bg-surface-elevated rounded-sm border border-hairline cursor-pointer"
+          className="relative w-full h-8 bg-surface-elevated rounded-sm border border-hairline cursor-pointer overflow-hidden"
         >
+          {/* Timeline background thumbnails */}
+          {thumbnails.length > 0 && (
+            <div className="absolute inset-0 flex overflow-hidden opacity-30 pointer-events-none">
+              {thumbnails.map((src, index) => (
+                <img
+                  key={index}
+                  src={src}
+                  alt=""
+                  className="h-full flex-1 object-cover border-r border-hairline/10 last:border-r-0"
+                />
+              ))}
+            </div>
+          )}
+
           {/* Trimmed selection highlight */}
           <div
             className="timeline-fill absolute h-full bg-accent-blue-soft border-l border-r border-accent-blue/30"
@@ -194,7 +284,7 @@ export default function TrimTimeline({
             style={{ left: `${playheadPercent}%` }}
           >
             <div className="w-[2px] h-[calc(100%+8px)] -mt-[4px] mx-auto bg-accent-red" />
-            <div className="w-2.5 h-2.5 rounded-full bg-accent-red mx-auto -mt-[26px]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-accent-red mx-auto -mt-[42px]" />
           </div>
         </div>
       </div>

@@ -16,6 +16,7 @@ interface ExportProgressProps {
   endTime: number;
   videoDims: { width: number; height: number };
   includeAudio: boolean;
+  exportFormat: "mp4" | "webm";
   onCancel: () => void;
   onComplete: (blob: Blob, mimeType: string) => void;
 }
@@ -27,6 +28,7 @@ export default function ExportProgress({
   endTime,
   videoDims,
   includeAudio,
+  exportFormat,
   onCancel,
   onComplete,
 }: ExportProgressProps) {
@@ -100,21 +102,36 @@ export default function ExportProgress({
 
         const outputStream = new MediaStream(tracks);
 
-        // Select mimeType
-        const mimeTypes = [
-          "video/mp4;codecs=h264,aac",
-          "video/mp4;codecs=h264",
-          "video/webm;codecs=h264,opus",
-          "video/webm;codecs=vp9,opus",
-          "video/webm",
-        ];
+        // Select mimeType based on format preference
+        const preferredMimeTypes = exportFormat === "mp4"
+          ? ["video/mp4;codecs=h264,aac", "video/mp4;codecs=h264", "video/mp4"]
+          : ["video/webm;codecs=h264,opus", "video/webm;codecs=vp9,opus", "video/webm"];
 
-        let selectedMimeType = "video/webm";
-        for (const type of mimeTypes) {
+        let selectedMimeType = "";
+        for (const type of preferredMimeTypes) {
           if (MediaRecorder.isTypeSupported(type)) {
             selectedMimeType = type;
             break;
           }
+        }
+
+        // If preferred is not supported, try the fallback format
+        if (!selectedMimeType) {
+          const fallbackMimeTypes = exportFormat === "mp4"
+            ? ["video/webm;codecs=h264,opus", "video/webm;codecs=vp9,opus", "video/webm"]
+            : ["video/mp4;codecs=h264,aac", "video/mp4;codecs=h264", "video/mp4"];
+
+          for (const type of fallbackMimeTypes) {
+            if (MediaRecorder.isTypeSupported(type)) {
+              selectedMimeType = type;
+              setStatus(`MP4 unsupported on this browser. Encoding as WebM...`);
+              break;
+            }
+          }
+        }
+
+        if (!selectedMimeType) {
+          selectedMimeType = "video/webm"; // Ultimate fallback
         }
 
         const options = {
