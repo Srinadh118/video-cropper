@@ -65,7 +65,7 @@ export default function ExportProgress({
           try {
             // Check if audio exists in video before setting up WebAudio
             // We use a temporary stream capture to probe audio tracks
-            const probeStream = video.captureStream ? video.captureStream() : ((video as any).mozCaptureStream ? (video as any).mozCaptureStream() : null);
+            const probeStream = (video as any).captureStream ? (video as any).captureStream() : ((video as any).mozCaptureStream ? (video as any).mozCaptureStream() : null);
             
             if (probeStream && probeStream.getAudioTracks().length > 0) {
               const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;

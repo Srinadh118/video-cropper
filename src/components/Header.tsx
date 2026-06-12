@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
+import { usePWAInstall } from "@/providers/PWAProvider";
 
 interface HeaderProps {
   onRestart?: () => void;
@@ -13,6 +14,7 @@ export default function Header({ onRestart, showStartNew = false }: HeaderProps)
   const router = useRouter();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isInstallable, installApp } = usePWAInstall();
 
   const handleLogoClick = () => {
     setIsMenuOpen(false);
@@ -84,6 +86,24 @@ export default function Header({ onRestart, showStartNew = false }: HeaderProps)
           >
             GitHub
           </a>
+          {isInstallable && (
+            <button
+              onClick={installApp}
+              className="h-7 px-3 bg-transparent text-[#f4f4f6] hover:bg-[#18191b]/50 border border-[#242728] hover:border-[#434345] text-xs font-medium rounded-md transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+                className="w-3.5 h-3.5 text-[#57c1ff]"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+              <span>Install App</span>
+            </button>
+          )}
           {showStartNew && onRestart && (
             <button
               onClick={onRestart}
@@ -153,6 +173,27 @@ export default function Header({ onRestart, showStartNew = false }: HeaderProps)
           >
             GitHub
           </a>
+          {isInstallable && (
+            <button
+              onClick={() => {
+                setIsMenuOpen(false);
+                installApp();
+              }}
+              className="h-9 w-full bg-transparent text-[#f4f4f6] border border-[#242728] hover:border-[#434345] hover:bg-[#18191b]/50 text-xs font-semibold rounded-md transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+                className="w-3.5 h-3.5 text-[#57c1ff]"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+              <span>Install App</span>
+            </button>
+          )}
           {showStartNew && onRestart && (
             <button
               onClick={() => {

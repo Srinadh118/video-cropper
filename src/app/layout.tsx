@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import { PWAProvider } from "@/providers/PWAProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -71,7 +72,9 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-[#07080a] text-[#cdcdcd]" suppressHydrationWarning>
-        {children}
+        <PWAProvider>
+          {children}
+        </PWAProvider>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-MLMVCP43P7"
           strategy="afterInteractive"
@@ -85,6 +88,19 @@ export default function RootLayout({
             gtag('config', 'G-MLMVCP43P7');
           `}
         </Script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Capture beforeinstallprompt event early before React hydrates
+              window.deferredPrompt = null;
+              window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                window.deferredPrompt = e;
+                window.dispatchEvent(new CustomEvent('pwa-installable'));
+              });
+            `
+          }}
+        />
       </body>
     </html>
   );

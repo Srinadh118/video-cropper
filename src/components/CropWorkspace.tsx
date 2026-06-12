@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState, MouseEvent, TouchEvent } from "react";
+import React, { useRef, useEffect, useState } from "react";
 
 interface CropRect {
   x: number;      // percent (0-100)

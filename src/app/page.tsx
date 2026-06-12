@@ -8,6 +8,7 @@ import ExportProgress from "@/components/ExportProgress";
 import ExportCompleted from "@/components/ExportCompleted";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PWAInstallBanner from "@/components/PWAInstallBanner";
 
 type AppStep = "UPLOAD" | "EDIT" | "EXPORT" | "COMPLETED";
 
@@ -248,6 +249,9 @@ export default function Home() {
                 Client-side video trimming and cropping. Your files never touch a server, preserving complete privacy.
               </p>
             </div>
+
+            {/* PWA Install Banner */}
+            <PWAInstallBanner />
 
             {/* Drag & Drop Area */}
             <VideoUpload onVideoSelected={handleVideoSelected} />
