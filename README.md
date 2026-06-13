@@ -54,23 +54,62 @@ Designed with a premium developer-tool aesthetic inspired by Raycast, this web a
 
 ---
 
-## Deploying to Cloudflare Pages (via GitHub)
+## Deploying to Cloudflare Workers
 
-This project is configured to deploy to Cloudflare Pages as a Cloudflare Worker using the recommended `@opennextjs/cloudflare` adapter. This compiles Next.js dynamic routing, server components, and asset handling to run on the Cloudflare Edge engine.
+This project is configured to deploy to Cloudflare Workers with Assets using the `@opennextjs/cloudflare` adapter. This compiles Next.js dynamic routing, server components, and static asset handling to run on the Cloudflare Edge engine.
 
-### Setup Instructions
+### Prerequisites
 
-1. **Push your code to GitHub**: Put your repository online.
-2. **Log into Cloudflare**: Go to the Cloudflare Dashboard and select **Workers & Pages**.
-3. **Create a Page**: Click **Create** -> **Pages** -> **Connect to Git** and select your repository.
-4. **Configure Build Settings**:
-   - **Framework Preset**: `None`
-   - **Build Command**: `npm run build-pages`
-   - **Build Output Directory**: `.open-next/assets`
-5. **Configure Compatibility Flags**:
-   - In the Cloudflare Pages settings, under **Settings** -> **Build & deployments** -> **Compatibility flags**:
-     - Add the `nodejs_compat` flag under **Production compatibility flags** and **Preview compatibility flags** (this is required to execute Next.js Node.js polyfills on the V8 worker engine).
-6. **Save and Deploy**: Click **Save and Deploy**. Cloudflare will pull your commits, compile the worker bundle, and deploy your site under a free `*.pages.dev` subdomain (with support for custom domains in the future).
+1. A Cloudflare Account.
+2. The Wrangler CLI installed (already included as a dev dependency).
+
+### Deployment Steps
+
+#### 1. CLI Deployment (Recommended)
+
+You can build and deploy the application directly from your local environment:
+
+1. **Log in to Cloudflare** via the CLI (if you haven't already):
+   ```bash
+   npx wrangler login
+   ```
+2. **Build and Deploy**:
+   Run the deployment script:
+   ```bash
+   npm run deploy-worker
+   ```
+   This will automatically build the Next.js app with the OpenNext adapter (`npm run build-worker`) and deploy the generated worker and static assets using `wrangler deploy`.
+
+#### 2. CI/CD Deployment (via GitHub Actions)
+
+To deploy automatically on push to your repository:
+
+1. Add your Cloudflare credentials (`CLOUDFLARE_API_TOKEN` and optionally `CLOUDFLARE_ACCOUNT_ID`) to your GitHub repository secrets.
+2. Create a GitHub Actions workflow file (e.g. `.github/workflows/deploy.yml`):
+   ```yaml
+   name: Deploy to Cloudflare Workers
+   on:
+     push:
+       branches:
+         - main
+   jobs:
+     deploy:
+       runs-on: ubuntu-latest
+       steps:
+         - uses: actions/checkout@v4
+         - uses: actions/setup-node@v4
+           with:
+             node-cache: 'npm'
+             node-version: 20
+         - name: Install dependencies
+           run: npm ci
+         - name: Build and Deploy
+           uses: cloudflare/wrangler-action@v3
+           with:
+             apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+             accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+             command: run deploy-worker
+   ```
 
 ---
 
